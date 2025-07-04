@@ -1,3 +1,4 @@
+console.log("Widget JS loaded");
 // Newsletter Widget JS
 (function(root) {
   if (document.getElementById('newsletterContainer')) return; // Prevent double-injection
@@ -33,6 +34,7 @@
                 <label class="form-label" for="email">Email address</label>
                 <input class="form-input" id="email" placeholder="Enter your email" required type="email" />
               </div>
+              <div class="cf-turnstile" data-sitekey="0x4AAAAAABjnEqi0fT57mwgZ" style="margin: 16px 0;"></div>
               <button class="submit-button" type="submit">Sign up</button>
             </form>
             <div class="form-message" id="formMessage" style="margin-top:16px;font-size:15px;"></div>
@@ -43,6 +45,7 @@
         </div>
       </div>
     </div>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   `;
 
   // Inject widget at end of body
@@ -116,6 +119,15 @@
     e.preventDefault();
     var email = emailInput.value;
     formMessage.textContent = '';
+    var turnstileToken = '';
+    var turnstileWidget = subscribeForm.querySelector('.cf-turnstile');
+    if (window.turnstile && turnstileWidget) {
+      turnstileToken = turnstile.getResponse(turnstileWidget.getAttribute('data-widget-id'));
+    }
+    if (!turnstileToken) {
+      formMessage.textContent = 'Please complete the CAPTCHA.';
+      return;
+    }
     if (email) {
       // Disable form
       emailInput.disabled = true;
@@ -124,7 +136,7 @@
       fetch('https://newsletter-worker.nmorrison.workers.dev', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, turnstile_token: turnstileToken })
       })
       .then(async (res) => {
         const data = await res.json().catch(() => ({}));
@@ -135,6 +147,9 @@
             successMessage.classList.remove('show');
             formSection.style.display = 'flex';
             emailInput.value = '';
+            if (window.turnstile && turnstileWidget) {
+              turnstile.reset(turnstileWidget.getAttribute('data-widget-id'));
+            }
             closeBanner();
           }, 3000);
         } else {
