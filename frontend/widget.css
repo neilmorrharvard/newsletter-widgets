@@ -1,0 +1,6 @@
+/* Newsletter Widget CSS */
+#newsletter-widget-root > div {
+  background: #f9fafb;
+  color: #222;
+  font-family: sans-serif;
+} 
