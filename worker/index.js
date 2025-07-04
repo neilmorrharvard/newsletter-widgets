@@ -113,7 +113,7 @@ async function subscribeToMailchimp(email, env) {
     email_address: email,
     status: 'subscribed',
     interests: {
-      "75cf611eb5": true
+      "960b22790b": true
     }
   });
   const auth = 'Basic ' + btoa('anystring:' + apiKey);
