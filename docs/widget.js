@@ -35,6 +35,7 @@
               </div>
               <button class="submit-button" type="submit">Sign up</button>
             </form>
+            <div class="form-message" id="formMessage" style="margin-top:16px;font-size:15px;"></div>
           </div>
         </div>
         <div class="success-message" id="successMessage">
@@ -59,6 +60,7 @@
   var successMessage = document.getElementById('successMessage');
   var emailInput = document.getElementById('email');
   var newsletterContainer = document.getElementById('newsletterContainer');
+  var formMessage = document.getElementById('formMessage');
 
   var isExpanded = false;
   var bannerVisible = false;
@@ -113,15 +115,39 @@
   subscribeForm.addEventListener('submit', function(e) {
     e.preventDefault();
     var email = emailInput.value;
+    formMessage.textContent = '';
     if (email) {
-      formSection.style.display = 'none';
-      successMessage.classList.add('show');
-      setTimeout(function() {
-        successMessage.classList.remove('show');
-        formSection.style.display = 'flex';
-        emailInput.value = '';
-        closeBanner();
-      }, 3000);
+      // Disable form
+      emailInput.disabled = true;
+      subscribeForm.querySelector('.submit-button').disabled = true;
+      formMessage.textContent = 'Submitting...';
+      fetch('https://newsletter-worker.nmorrison.workers.dev', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+      .then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.success) {
+          formSection.style.display = 'none';
+          successMessage.classList.add('show');
+          setTimeout(function() {
+            successMessage.classList.remove('show');
+            formSection.style.display = 'flex';
+            emailInput.value = '';
+            closeBanner();
+          }, 3000);
+        } else {
+          formMessage.textContent = data.error || 'An error occurred. Please try again.';
+        }
+      })
+      .catch(() => {
+        formMessage.textContent = 'Network error. Please try again.';
+      })
+      .finally(() => {
+        emailInput.disabled = false;
+        subscribeForm.querySelector('.submit-button').disabled = false;
+      });
     }
   });
 
