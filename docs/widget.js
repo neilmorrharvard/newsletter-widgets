@@ -128,9 +128,8 @@ console.log("Widget JS loaded");
     var email = emailInput.value;
     formMessage.textContent = '';
     var turnstileToken = '';
-    var turnstileWidget = subscribeForm.querySelector('.cf-turnstile');
-    if (window.turnstile && turnstileWidget) {
-      turnstileToken = turnstile.getResponse(turnstileWidget.getAttribute('data-widget-id'));
+    if (window.turnstile) {
+      turnstileToken = turnstile.getResponse();
     }
     if (!turnstileToken) {
       formMessage.textContent = 'Please complete the CAPTCHA.';
@@ -155,8 +154,8 @@ console.log("Widget JS loaded");
             successMessage.classList.remove('show');
             formSection.style.display = 'flex';
             emailInput.value = '';
-            if (window.turnstile && turnstileWidget) {
-              turnstile.reset(turnstileWidget.getAttribute('data-widget-id'));
+            if (window.turnstile) {
+              turnstile.reset();
             }
             closeBanner();
           }, 3000);
