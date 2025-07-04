@@ -45,13 +45,21 @@ console.log("Widget JS loaded");
         </div>
       </div>
     </div>
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   `;
 
   // Inject widget at end of body
   var temp = document.createElement('div');
   temp.innerHTML = widgetHTML;
   document.body.appendChild(temp.firstElementChild);
+
+  // Add Turnstile script separately
+  if (!document.querySelector('script[src*="turnstile/v0/api.js"]')) {
+    var turnstileScript = document.createElement('script');
+    turnstileScript.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    turnstileScript.async = true;
+    turnstileScript.defer = true;
+    document.head.appendChild(turnstileScript);
+  }
 
   // Widget logic
   var banner = document.getElementById('newsletterBanner');
