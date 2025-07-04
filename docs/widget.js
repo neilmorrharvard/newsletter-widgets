@@ -34,9 +34,9 @@ console.log("Widget JS loaded");
                 <label class="form-label" for="email">Email address</label>
                 <input class="form-input" id="email" placeholder="Enter your email" required type="email" />
               </div>
-              <div class="cf-turnstile" data-sitekey="0x4AAAAAABjnEqi0fT57mwgZ" style="margin: 16px 0;"></div>
               <button class="submit-button" type="submit">Sign up</button>
             </form>
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAABjnEqi0fT57mwgZ" style="margin: 16px 0;"></div>
             <div class="form-message" id="formMessage" style="margin-top:16px;font-size:15px;"></div>
           </div>
         </div>
