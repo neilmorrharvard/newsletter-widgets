@@ -1,6 +1,11 @@
 name = "newsletter-worker"
 type = "javascript"
-account_id = "YOUR_ACCOUNT_ID"
+account_id = "3bc447b37c612de5c3eefb836c19981b"
 workers_dev = true
 main = "index.js"
-compatibility_date = "2024-05-01" 
+compatibility_date = "2024-05-01"
+
+# KV namespace for rate limiting
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "dd4ff11a79694d0a858a8f2497b4cb2a" 

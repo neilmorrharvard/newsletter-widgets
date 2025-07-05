@@ -84,7 +84,10 @@ export default {
       });
     }
 
-    return new Response(JSON.stringify({ success: true }), {
+    return new Response(JSON.stringify({ 
+      success: true, 
+      message: 'Please check your email to confirm your subscription!' 
+    }), {
       status: 200,
       headers: { 'content-type': 'application/json', ...corsHeaders },
     });
@@ -190,7 +193,7 @@ function ii(a, b, c, d, x, s, t) {
   return cmn(c ^ (b | ~d), a, b, x, s, t);
 }
 function md51(s) {
-  txt = '';
+  var txt = '';
   var n = s.length,
     state = [1732584193, -271733879, -1732584194, 271733878],
     i;
@@ -247,7 +250,7 @@ async function subscribeToMailchimp(email, env) {
   const url = `https://${serverPrefix}.api.mailchimp.com/3.0/lists/${audienceId}/members/${subscriberHash}`;
   const body = JSON.stringify({
     email_address: email,
-    status: 'subscribed',
+    status: 'pending',
     interests: {
       "960b22790b": true
     }
@@ -261,7 +264,28 @@ async function subscribeToMailchimp(email, env) {
     },
     body,
   });
+  
   if (res.status === 200 || res.status === 201) {
+    // Add a note to the subscriber's profile
+    const noteUrl = `https://${serverPrefix}.api.mailchimp.com/3.0/lists/${audienceId}/members/${subscriberHash}/notes`;
+    const noteBody = JSON.stringify({
+      note: `Resubscribed via newsletter widget on ${new Date().toISOString().slice(0, 10)}`
+    });
+    
+    try {
+      await fetch(noteUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': auth,
+          'Content-Type': 'application/json',
+        },
+        body: noteBody,
+      });
+    } catch (noteErr) {
+      // Don't fail the subscription if adding the note fails
+      console.log('Failed to add note:', noteErr);
+    }
+    
     return { success: true };
   } else {
     const err = await res.json().catch(() => ({}));
