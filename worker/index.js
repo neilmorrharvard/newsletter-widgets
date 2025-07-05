@@ -251,6 +251,7 @@ async function subscribeToMailchimp(email, env) {
   const body = JSON.stringify({
     email_address: email,
     status: 'pending',
+    source: 'Newsletter Widget',
     interests: {
       "960b22790b": true
     }

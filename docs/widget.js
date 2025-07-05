@@ -78,10 +78,27 @@ function injectNewsletterWidget() {
     var isExpanded = false;
     var bannerVisible = false;
 
+    // Check if user has interacted with modal in the last 5 days
+    function shouldShowModal() {
+      var lastInteraction = localStorage.getItem('newsletterModalLastInteraction');
+      if (!lastInteraction) return true;
+      
+      var lastInteractionDate = new Date(lastInteraction);
+      var fiveDaysAgo = new Date();
+      fiveDaysAgo.setDate(fiveDaysAgo.getDate() - 5);
+      
+      return lastInteractionDate < fiveDaysAgo;
+    }
+
+    // Record user interaction with modal
+    function recordModalInteraction() {
+      localStorage.setItem('newsletterModalLastInteraction', new Date().toISOString());
+    }
+
     // Handle scroll to show/hide banner
     window.addEventListener('scroll', function() {
       var scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-      if (scrollPercent >= 10 && !bannerVisible) {
+      if (scrollPercent >= 10 && !bannerVisible && shouldShowModal()) {
         newsletterContainer.classList.add('visible');
         bannerVisible = true;
       } else if (scrollPercent < 10 && bannerVisible && !isExpanded) {
@@ -92,11 +109,13 @@ function injectNewsletterWidget() {
 
     expandButton.addEventListener('click', function(e) {
       e.stopPropagation();
+      recordModalInteraction();
       toggleExpanded();
     });
 
     bannerCloseButton.addEventListener('click', function(e) {
       e.stopPropagation();
+      recordModalInteraction();
       closeBanner();
     });
 
@@ -150,6 +169,7 @@ function injectNewsletterWidget() {
         .then(async (res) => {
           const data = await res.json().catch(() => ({}));
           if (res.ok && data.success) {
+            recordModalInteraction();
             formSection.style.display = 'none';
             successMessage.classList.add('show');
             setTimeout(function() {
