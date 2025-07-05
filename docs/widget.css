@@ -14,11 +14,11 @@
 }
 .newsletter-container.visible { bottom: 15vh; }
 .newsletter-container.expanded {
-    top: 20vh;
-    bottom: 20vh;
+    top: 15vh;
+    bottom: 15vh;
     left: 20px;
     right: 20px;
-    max-width: none;
+    max-width: 800px;
     transform: none;
     padding: 0;
     z-index: 9999;
