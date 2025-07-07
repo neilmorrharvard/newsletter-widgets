@@ -132,6 +132,14 @@ function injectNewsletterWidget() {
     }
 
     function closeBanner() {
+      // Fire PostHog events for closing
+      if (window.posthog) {
+        if (isExpanded) {
+          window.posthog.capture('newsletter_modal_closed');
+        } else {
+          window.posthog.capture('newsletter_banner_closed');
+        }
+      }
       newsletterContainer.classList.remove('visible');
       newsletterContainer.classList.remove('expanded');
       bannerVisible = false;
