@@ -101,6 +101,7 @@ function injectNewsletterWidget() {
       if (scrollPercent >= 10 && !bannerVisible && shouldShowModal()) {
         newsletterContainer.classList.add('visible');
         bannerVisible = true;
+        if (window.posthog) window.posthog.capture('newsletter_banner_shown');
       } else if (scrollPercent < 10 && bannerVisible && !isExpanded) {
         newsletterContainer.classList.remove('visible');
         bannerVisible = false;
@@ -111,6 +112,7 @@ function injectNewsletterWidget() {
       e.stopPropagation();
       recordModalInteraction();
       toggleExpanded();
+      if (window.posthog) window.posthog.capture('newsletter_modal_expanded');
     });
 
     bannerCloseButton.addEventListener('click', function(e) {
@@ -146,6 +148,7 @@ function injectNewsletterWidget() {
     // Handle form submission
     subscribeForm.addEventListener('submit', function(e) {
       e.preventDefault();
+      if (window.posthog) window.posthog.capture('newsletter_email_submitted');
       var email = emailInput.value;
       formMessage.textContent = '';
       var turnstileToken = '';
