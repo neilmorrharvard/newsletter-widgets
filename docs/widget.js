@@ -1,9 +1,44 @@
 console.log("Widget JS loaded");
 
+const NEWSLETTER_VARIANTS = [
+  {
+    match: (pathname) => pathname.includes('/regina-news'),
+    copy: {
+      title: "Stay in the loop (Regina)",
+      subtitle: "Join our Regina newsletter for the latest updates.",
+      banner: "This story's featured in our daily Regina recap."
+    },
+    audienceId: "REGINA_AUDIENCE_ID"
+  },
+  {
+    match: (pathname) => pathname.includes('/estevan-mercury'),
+    copy: {
+      title: "Stay in the loop (Estevan)",
+      subtitle: "Join our Estevan Mercury newsletter for local news.",
+      banner: "This story's featured in our Estevan Mercury recap."
+    },
+    audienceId: "ESTEVAN_AUDIENCE_ID"
+  },
+  {
+    match: (_) => true, // Default
+    copy: {
+      title: "Stay in the loop",
+      subtitle: "Join our newsletter and never miss an update. Get the latest news, insights, and exclusive content delivered straight to your inbox.",
+      banner: "This story's featured in our daily recap."
+    },
+    audienceId: "DEFAULT_AUDIENCE_ID"
+  }
+];
+
 function injectNewsletterWidget() {
   // Newsletter Widget JS
   (function(root) {
     if (document.getElementById('newsletterContainer')) return; // Prevent double-injection
+
+    // Select variant based on path
+    const pathname = window.location.pathname;
+    let selectedVariant = NEWSLETTER_VARIANTS.find(v => v.match(pathname));
+    if (!selectedVariant) selectedVariant = NEWSLETTER_VARIANTS[NEWSLETTER_VARIANTS.length - 1];
 
     // Widget HTML
     var widgetHTML = `
@@ -17,7 +52,7 @@ function injectNewsletterWidget() {
           </button>
           <div class="banner-content" id="bannerContent">
             <div class="banner-emoji">☝️</div>
-            <div class="banner-text">This story's featured in our daily Regina recap.</div>
+            <div class="banner-text">${selectedVariant.copy.banner}</div>
             <button class="expand-button" id="expandButton">
               <span>Try it free</span>
               <svg class="arrow" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -28,8 +63,8 @@ function injectNewsletterWidget() {
           <div class="form-section" id="formSection">
             <div class="form-content">
               <div class="form-header">
-                <h3 class="form-title">Stay in the loop</h3>
-                <p class="form-subtitle">Join our newsletter and never miss an update. Get the latest news, insights, and exclusive content delivered straight to your inbox.</p>
+                <h3 class="form-title">${selectedVariant.copy.title}</h3>
+                <p class="form-subtitle">${selectedVariant.copy.subtitle}</p>
               </div>
               <form class="form-group" id="subscribeForm">
                 <div class="input-wrapper">
@@ -175,7 +210,7 @@ function injectNewsletterWidget() {
         fetch('https://newsletter-worker.nmorrison.workers.dev', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, turnstile_token: turnstileToken })
+          body: JSON.stringify({ email, turnstile_token: turnstileToken, audience_id: selectedVariant.audienceId })
         })
         .then(async (res) => {
           const data = await res.json().catch(() => ({}));
